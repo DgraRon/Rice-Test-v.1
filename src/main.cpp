@@ -19,7 +19,6 @@ const char* password = "12345678";
 #define LED_GREEN   15  // LED เขียว: Servo หมุน
 #define SERVO_PIN   16  // ขาเชื่อม Servo
 
-
 // เซ็นเซอร์สี TCS34725
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 uint16_t r, g, b, c;
