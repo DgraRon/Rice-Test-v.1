@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องจำแนกเกรดข้าว</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>เครื่องจำแนกเกรดข้าว</h1>
+    
+    <div class="timer">
+        เวลาทำงาน: <span id="time">00:00:00</span>
+    </div>
+
+    <div class="total-count">
+        จำนวนข้าวทั้งหมด: <span id="totalCount">0</span>
+    </div>
+
+    <div class="notification-settings">
+        <label class="switch">
+            <input type="checkbox" id="notificationToggle" onchange="toggleNotification()">
+            <span class="slider round"></span>
+        </label>
+        <span>เปิด/ปิดการแจ้งเตือน</span>
+    </div>
+
+    <div class="mode-selector">
+        <button onclick="setMode('manual')" class="mode-btn" id="manualBtn">โหมดแมนนวล</button>
+        <button onclick="setMode('random')" class="mode-btn" id="randomBtn">โหมดสุ่ม</button>
+    </div>
+
+    <div id="notification" class="notification">
+        <span id="notificationText"></span>
+        <span class="notification-close" onclick="closeNotification()">&times;</span>
+    </div>
+
+    <div class="controls">
+        <button onclick="start()" id="startBtn">เริ่ม</button>
+        <button onclick="stop()" id="stopBtn">หยุด</button>
+        <button onclick="reset()" id="resetBtn">รีเซ็ต</button>
+    </div>
+
+    <table class="grade-table">
+        <tr>
+            <th>เกรด</th>
+            <th>จำนวน</th>
+        </tr>
+        <tr><td>0</td><td id="grade0">0</td></tr>
+        <tr><td>1</td><td id="grade1">0</td></tr>
+        <tr><td>2</td><td id="grade2">0</td></tr>
+        <tr><td>3</td><td id="grade3">0</td></tr>
+        <tr><td>4</td><td id="grade4">0</td></tr>
+        <tr><td>5</td><td id="grade5">0</td></tr>
+        <tr><td>ไม่สามารถระบุได้</td><td id="grade6">0</td></tr>
+    </table>
+
+    <script>
+        let startTime;
+        let timerInterval;
+        let notificationEnabled = false;
+        const socket = new WebSocket(`ws://${window.location.hostname}/ws`);
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.type === "gradeUpdate") {
+                document.getElementById(`grade${data.grade}`).textContent = data.count;
+                document.getElementById("totalCount").textContent = data.total;
+            } 
+            else if (data.type === "colorDetection" && notificationEnabled) {
+                showNotification(data.message);
+            }
+        };
+
+        function toggleNotification() {
+            notificationEnabled = document.getElementById('notificationToggle').checked;
+            showNotification(notificationEnabled ? 'เปิดการแจ้งเตือนแล้ว' : 'ปิดการแจ้งเตือนแล้ว');
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function closeNotification() {
+            document.getElementById('notification').classList.remove('show');
+        }
+
+        function updateTimer() {
+            if (!startTime) return;
+            const now = new Date().getTime();
+            const diff = now - startTime;
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            document.getElementById('time').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function setMode(mode) {
+            fetch(`/setMode?mode=${mode}`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('manualBtn').classList.remove('active');
+                    document.getElementById('randomBtn').classList.remove('active');
+                    document.getElementById(`${mode}Btn`).classList.add('active');
+                });
+        }
+
+        function start() {
+            fetch('/start')
+                .then(response => response.text())
+                .then(data => {
+                    startTime = new Date().getTime();
+                    timerInterval = setInterval(updateTimer, 1000);
+                });
+        }
+
+        function stop() {
+            fetch('/stop')
+                .then(response => response.text())
+                .then(data => {
+                    clearInterval(timerInterval);
+                });
+        }
+
+        function reset() {
+            fetch('/reset')
+                .then(response => response.text())
+                .then(data => {
+                    clearInterval(timerInterval);
+                    startTime = null;
+                    document.getElementById('time').textContent = '00:00:00';
+                    document.getElementById('totalCount').textContent = '0';
+                    for(let i = 0; i <= 6; i++) {
+                        document.getElementById(`grade${i}`).textContent = '0';
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

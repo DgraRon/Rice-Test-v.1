@@ -1,0 +1,265 @@
+/* พื้นฐานหน้าเว็บ */
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    background-color: #f0f2f5;
+}
+
+h1 {
+    color: #1a237e;
+    margin-bottom: 30px;
+    font-size: 2em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* ส่วนแสดงเวลาและจำนวนรวม */
+.timer, .total-count {
+    font-size: 1.2em;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* ส่วนควบคุมโหมด */
+.mode-selector {
+    margin: 20px 0;
+}
+
+.mode-btn {
+    margin: 0 10px;
+    padding: 12px 24px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.mode-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.mode-btn.active {
+    background-color: #357a38;
+    transform: translateY(1px);
+}
+
+/* ปุ่มควบคุม */
+.controls {
+    margin: 20px 0;
+}
+
+.controls button {
+    margin: 0 10px;
+    padding: 12px 30px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#startBtn {
+    background-color: #4CAF50;
+}
+
+#startBtn:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+#stopBtn {
+    background-color: #f44336;
+}
+
+#stopBtn:hover {
+    background-color: #da190b;
+    transform: translateY(-2px);
+}
+
+#resetBtn {
+    background-color: #2196F3;
+}
+
+#resetBtn:hover {
+    background-color: #0b7dda;
+    transform: translateY(-2px);
+}
+
+/* ตารางแสดงเกรด */
+.grade-table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.grade-table th, .grade-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.grade-table th {
+    background-color: #1a237e;
+    color: white;
+    font-weight: bold;
+}
+
+.grade-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.grade-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* สวิตช์แจ้งเตือน */
+.notification-settings {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #4CAF50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* การแจ้งเตือน */
+.notification {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.notification.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.notification-close {
+    color: #fff;
+    float: right;
+    cursor: pointer;
+    margin-left: 15px;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.notification-close:hover {
+    color: #ccc;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .mode-btn, .controls button {
+        margin: 5px;
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+
+    .grade-table {
+        width: 95%;
+        font-size: 0.9em;
+    }
+
+    .notification {
+        width: 90%;
+        min-width: auto;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .timer, .total-count {
+        font-size: 1em;
+    }
+}
