@@ -57,7 +57,7 @@ void loop() {
   
   lcd.setCursor(0, 1);
   lcd.print("Dir: Forward");
-  servo360.write(180);
+  servo360.write(100);
   delay(2000);
   
   lcd.setCursor(0, 1);
@@ -67,7 +67,7 @@ void loop() {
   
   lcd.setCursor(0, 1);
   lcd.print("Dir: Reverse");
-  servo360.write(0);
+  servo360.write(70);
   delay(2000);
   
   lcd.setCursor(0, 1);
