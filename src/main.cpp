@@ -6,26 +6,30 @@
 #include <Preferences.h>
 #include <ESP32Servo.h>
 #include <ArduinoJson.h>
+#include <Wire.h>
 #include <Keypad.h>
+#include <Keypad_I2C.h>
 #include <LiquidCrystal_I2C.h>
 #include <SPI.h>
 #include <SD.h>
 #include <time.h>
 
 // ================= PINOUT CONFIGURATION =================
+// --- ตั้งค่า Address ของ PCF8574 ---
+#define KEYPAD_I2C_ADDR 0x38
 // I2C (LCD)
 #define SDA_PIN 21
 #define SCL_PIN 22
 // SPI (SD Card)
 #define SD_CS 5
 // Servos
-#define SERVO1_PIN 12 // M1: 360 Feed
-#define SERVO2_PIN 13 // M2: 180 Sort (0-6)
-#define SERVO3_PIN 14 // M2: 180 Gate
+#define SERVO1_PIN 27 // M1: 360 Feed
+#define SERVO2_PIN 26 // M2: 180 Sort (0-6)
+#define SERVO3_PIN 25 // M2: 180 Gate
 // LEDs
-#define LED_RED 25
-#define LED_GREEN 26
-#define LED_YELLOW 27
+#define LED_RED 14
+#define LED_GREEN 12
+#define LED_YELLOW 13
 // Sensor
 #define SENSOR_PIN 34 
 // Keypad 4x4
@@ -37,9 +41,10 @@ char keys[ROWS][COLS] = {
   {'7','8','9','C'}, // C = Start
   {'*','0','#','D'}  // D = Stop
 };
-byte rowPins[ROWS] = {32, 33, 4, 16}; 
-byte colPins[COLS] = {17, 15, 2, 0}; // ระวัง: Pin 0 และ 2 เป็น Strapping ห้ามกดปุ่มค้างตอนเปิดเครื่อง
-Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+byte rowPins[ROWS] = {0, 1, 2, 3}; 
+byte colPins[COLS] = {4, 5, 6, 7}; // ระวัง: Pin 0 และ 2 เป็น Strapping ห้ามกดปุ่มค้างตอนเปิดเครื่อง
+// สร้างออบเจกต์ Keypad แบบ I2C
+Keypad_I2C keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS, KEYPAD_I2C_ADDR);
 
 // ================= OBJECTS & VARS =================
 AsyncWebServer server(80);
@@ -186,6 +191,12 @@ void setSystemRunning(bool state) {
 void setup() {
     Serial.begin(115200);
     
+    // เริ่มต้นระบบ I2C ที่พิน 21(SDA) และ 22(SCL)
+    Wire.begin(SDA_PIN, SCL_PIN);
+    
+    // เริ่มการทำงานของ Keypad
+    keypad.begin();
+
     // Init Hardware
     pinMode(LED_RED, OUTPUT); pinMode(LED_GREEN, OUTPUT); pinMode(LED_YELLOW, OUTPUT);
     servo1.attach(SERVO1_PIN); servo2.attach(SERVO2_PIN); servo3.attach(SERVO3_PIN);
@@ -199,7 +210,7 @@ void setup() {
     SD.begin(SD_CS);
 
     // WiFi Access Point (Fallback)
-    WiFi.softAP("Rice_Sorter_M4", "12345678"); // สร้างเน็ตตัวเองเสมอ เผื่อมือถือมาต่อ
+    WiFi.softAP("Rice_Sorter", "12345678"); // สร้างเน็ตตัวเองเสมอ เผื่อมือถือมาต่อ
     lcd.setCursor(0,0); lcd.print("WiFi Ready!");
     delay(1000);
 
